@@ -18,7 +18,7 @@ class MainLayout(FloatLayout):
         self.add_operation_categories.clear_widgets()
         categories_names = ['Продукты', 'Транспорт', 'Культура', 'Обучение', 'Здоровье', 'Досуг', 'Другое']
         categories_images = ['basket.png', 'car.png', 'museum.png', 'brains.png', 'medicine.png', 'flying_snake.png', 'question.png']
-        categories_colors = [[0.12, 0.45, 0.27], [0.75, 0.75, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27]]
+        categories_colors = [[0.91, 0.45, 0.5], [0.26, 0.19, 0.54], [0.27, 0.58, 0.29], [1, 0.63, 0], [0.7, 0.16, 0.13], [0.47, 0.87, 0.91], [0, 0.19, 0.33]]
         for i in range (len(categories_names)):
             border = RelativeLayout(size_hint=(None, 1)) # pix
             border.size=(150 / 3, border.size[1]) # pix
@@ -45,8 +45,10 @@ class MainLayout(FloatLayout):
             for i in range (len(operations)):
                 layout = RelativeLayout(size_hint_y=None, size=(1, 225 / 3)) # pix
                 layout.add_widget(Button())
-                layout.add_widget(Label(text=str(operations[i]['type']), size_hint=(0.5, 1)))
-                layout.add_widget(Label(text=str(operations[i]['value']), size_hint=(0.5, 1), pos_hint={'right': 1}))
+                layout.add_widget(Label(text=str(operations[i]['type']), size_hint=(0.5, 0.5)))
+                layout.add_widget(Label(text=str(operations[i]['value']), size_hint=(0.5, 0.5), pos_hint={'right': 1}))
+                layout.add_widget(Label(text=str(operations[i]['category']), size_hint=(0.5, 0.5), pos_hint={'top': 1}))
+                layout.add_widget(Label(text=str(operations[i]['description']), size_hint=(0.5, 0.5), pos_hint={'top': 1, 'right': 1}))
                 self.operations_list.add_widget(layout)
             summ = 0
             for i in operations:
@@ -135,7 +137,7 @@ class MainLayout(FloatLayout):
         self.add_operation_categories.clear_widgets()
         categories_names = ['Зарплата', 'Пенсия', 'Подарок']
         categories_images = ['coins.png', 'letter.png', 'prize.png']
-        categories_colors = [[0.12, 0.45, 0.27], [0.47, 0.33, 0.24], [0.85, 0.85, 0.27]]
+        categories_colors = [[1, 0.84, 0], [0.24, 0.37, 0.54], [0.84, 0.19, 0.2]]
         for i in range (len(categories_names)):
             border = RelativeLayout(size_hint=(None, 1)) # pix
             border.size=(150 / 3, border.size[1]) # pix
@@ -163,7 +165,7 @@ class MainLayout(FloatLayout):
         self.add_operation_categories.clear_widgets()
         categories_names = ['Продукты', 'Транспорт', 'Культура', 'Обучение', 'Здоровье', 'Досуг', 'Другое']
         categories_images = ['basket.png', 'car.png', 'museum.png', 'brains.png', 'medicine.png', 'flying_snake.png', 'question.png']
-        categories_colors = [[0.12, 0.45, 0.27], [0.75, 0.75, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27]]
+        categories_colors = [[0.91, 0.45, 0.5], [0.26, 0.19, 0.54], [0.27, 0.58, 0.29], [1, 0.63, 0], [0.7, 0.16, 0.13], [0.47, 0.87, 0.91], [0, 0.19, 0.33]]
         for i in range (len(categories_names)):
             border = RelativeLayout(size_hint=(None, 1)) # pix
             border.size=(150 / 3, border.size[1]) # pix
