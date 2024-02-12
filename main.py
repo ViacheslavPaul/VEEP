@@ -1,18 +1,43 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.relativelayout import RelativeLayout
-from kivy.graphics import Color, RoundedRectangle
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.graphics import Color, RoundedRectangle, Ellipse, Rectangle
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.uix.popup import Popup
+from kivy.uix.widget import Widget
 from kivy.storage.jsonstore import JsonStore
 
 from kivy.core.window import Window # del
 Window.size = (1080 / 3, 2202 / 3) # del
 
 class MainLayout(FloatLayout):
+    def __init__(self, **kwargs):
+        super(MainLayout, self).__init__(**kwargs)
+        self.update()
+        self.add_operation_categories.clear_widgets()
+        categories_names = ['Продукты', 'Транспорт', 'Культура', 'Обучение', 'Здоровье', 'Досуг', 'Другое']
+        categories_images = ['basket.png', 'car.png', 'museum.png', 'brains.png', 'medicine.png', 'flying_snake.png', 'question.png']
+        categories_colors = [[0.12, 0.45, 0.27], [0.75, 0.75, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27]]
+        for i in range (len(categories_names)):
+            border = RelativeLayout(size_hint=(None, 1)) # pix
+            border.size=(150 / 3, border.size[1]) # pix
+            btn = Button(background_color=(0, 0, 0, 0), text=categories_names[i], font_size=0, size_hint=(1, 1), on_press=self.change_category)
+            border.add_widget(btn)
+            img = RelativeLayout(size=(120 / 3, 120 / 3), pos_hint={'center_x': 0.6, 'y': 0.25}) # pix
+            img.canvas.add(Color(categories_colors[i][0], categories_colors[i][1], categories_colors[i][2]))
+            img.canvas.add(Ellipse(size=img.size)) # pix
+            img.canvas.add(Color(1.5, 1.5, 1.5))
+            img.canvas.add(Rectangle(pos=(img.size[0] / 2 - 37.5 / 3, img.size[0] / 2 - 37.5 / 3), size=(75 / 3, 75 / 3), source='images/categories_icons/'+categories_images[i])) # pix
+            border.add_widget(img)
 
-    def to_operations_list(self):
+            lb = Label(text=categories_names[i], size=(200, 0), pos_hint={'center_x': 0.5, 'y': -0.1}, text_size=(200, 159 / 3), font_size= 40 / 3, halign='center', valign='bottom', bold=True) # pix
+            border.add_widget(lb)
+
+            self.add_operation_categories.add_widget(border)
+        self.add_operation_categories.add_widget(Widget())
+
+    def update(self):
         store = JsonStore('VEEP_save.json')
         try:
             operations = store.get('VEEP')["operations"]
@@ -23,19 +48,38 @@ class MainLayout(FloatLayout):
                 layout.add_widget(Label(text=str(operations[i]['type']), size_hint=(0.5, 1)))
                 layout.add_widget(Label(text=str(operations[i]['value']), size_hint=(0.5, 1), pos_hint={'right': 1}))
                 self.operations_list.add_widget(layout)
+            summ = 0
+            for i in operations:
+                if i['type'] == 'add':
+                    summ += float(i['value'])
+            if summ % 1 == 0:
+                summ = int(summ)
+            self.main_income_info.text = str(summ)
+            summ = 0
+            for i in operations:
+                if i['type'] == 'rem':
+                    summ += float(i['value'])
+            if summ % 1 == 0:
+                summ = int(summ)
+            self.main_expenses_info.text = str(summ)
+            summ = 0
+            for i in operations:
+                if i['type'] == 'add':
+                    summ += float(i['value'])
+                elif i['type'] == 'rem':
+                    summ -= float(i['value'])
+            if summ % 1 == 0:
+                summ = int(summ)
+            self.main_sum_info.text = str(summ)
         except KeyError:
             pass
-        finally:
-            self.screen_manager.current = 'operations'
 
     def add_purpose(self):
         purpose = RelativeLayout(size_hint=(None, None), size=(480 / 3, self.purposes.size[1] - 60 / 3)) # pix
         purpose.canvas.add(Color(0.19, 0.19, 0.19))
         purpose.canvas.add(RoundedRectangle(size=purpose.size, radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3])) # pix
         self.purposes.add_widget(purpose)
-
-class Add_operation_Popup(Popup):
-
+#--------------------------------------------------------
     cant = False
     def add_action(self, instance):
         marks = ['/', '*', '+', '-']
@@ -76,14 +120,39 @@ class Add_operation_Popup(Popup):
         if (instance.text in marks) and (self.operation_value.text[len(self.operation_value.text)-2] in marks):
             self.operation_value.text = self.operation_value.text[0:len(self.operation_value.text) - 2:] + instance.text
 
-    operation_type = 'rem'
+    def change_category(self, instance):
+        self.operation_category = instance.text
+        print (self.operation_category)
 
+    operation_type = 'rem'
+    operation_category = 'Другое'
     def operation_type_to_add(self, instance):
         self.operation_type = 'add'
         instance.background_color = (0.15, 0.85, 0.15, 1)
         instance.color = (1, 1, 1, 1)
         self.type_to_rem_button.background_color = (0, 0, 0, 0)
         self.type_to_rem_button.color = (1, 0.2, 0.2, 1)
+        self.add_operation_categories.clear_widgets()
+        categories_names = ['Зарплата', 'Пенсия', 'Подарок']
+        categories_images = ['coins.png', 'letter.png', 'prize.png']
+        categories_colors = [[0.12, 0.45, 0.27], [0.47, 0.33, 0.24], [0.85, 0.85, 0.27]]
+        for i in range (len(categories_names)):
+            border = RelativeLayout(size_hint=(None, 1)) # pix
+            border.size=(150 / 3, border.size[1]) # pix
+            btn = Button(background_color=(0, 0, 0, 0), text=categories_names[i], font_size=0, size_hint=(1, 1), on_press=self.change_category)
+            border.add_widget(btn)
+            img = RelativeLayout(size=(120 / 3, 120 / 3), pos_hint={'center_x': 0.6, 'y': 0.25}) # pix
+            img.canvas.add(Color(categories_colors[i][0], categories_colors[i][1], categories_colors[i][2]))
+            img.canvas.add(Ellipse(size=img.size)) # pix
+            img.canvas.add(Color(1.5, 1.5, 1.5))
+            img.canvas.add(Rectangle(pos=(img.size[0] / 2 - 37.5 / 3, img.size[0] / 2 - 37.5 / 3), size=(75 / 3, 75 / 3), source='images/categories_icons/'+categories_images[i])) # pix
+            border.add_widget(img)
+
+            lb = Label(text=categories_names[i], size=(200, 0), pos_hint={'center_x': 0.5, 'y': -0.1}, text_size=(200, 159 / 3), font_size= 40 / 3, halign='center', valign='bottom', bold=True) # pix
+            border.add_widget(lb)
+
+            self.add_operation_categories.add_widget(border)
+        self.add_operation_categories.add_widget(Widget())
 
     def operation_type_to_rem(self, instance):
         self.operation_type = 'rem'
@@ -91,24 +160,48 @@ class Add_operation_Popup(Popup):
         instance.color = (1, 1, 1, 1)
         self.type_to_add_button.background_color = (0, 0, 0, 0)
         self.type_to_add_button.color = (0.2, 1, 0.2, 1)
+        self.add_operation_categories.clear_widgets()
+        categories_names = ['Продукты', 'Транспорт', 'Культура', 'Обучение', 'Здоровье', 'Досуг', 'Другое']
+        categories_images = ['basket.png', 'car.png', 'museum.png', 'brains.png', 'medicine.png', 'flying_snake.png', 'question.png']
+        categories_colors = [[0.12, 0.45, 0.27], [0.75, 0.75, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27], [0.12, 0.45, 0.27]]
+        for i in range (len(categories_names)):
+            border = RelativeLayout(size_hint=(None, 1)) # pix
+            border.size=(150 / 3, border.size[1]) # pix
+            btn = Button(background_color=(0, 0, 0, 0), text=categories_names[i], font_size=0, size_hint=(1, 1), on_press=self.change_category)
+            border.add_widget(btn)
+            img = RelativeLayout(size=(120 / 3, 120 / 3), pos_hint={'center_x': 0.6, 'y': 0.25}) # pix
+            img.canvas.add(Color(categories_colors[i][0], categories_colors[i][1], categories_colors[i][2]))
+            img.canvas.add(Ellipse(size=img.size)) # pix
+            img.canvas.add(Color(1.5, 1.5, 1.5))
+            img.canvas.add(Rectangle(pos=(img.size[0] / 2 - 37.5 / 3, img.size[0] / 2 - 37.5 / 3), size=(75 / 3, 75 / 3), source='images/categories_icons/'+categories_images[i])) # pix
+            border.add_widget(img)
+
+            lb = Label(text=categories_names[i], size=(200, 0), pos_hint={'center_x': 0.5, 'y': -0.1}, text_size=(200, 159 / 3), font_size= 40 / 3, halign='center', valign='bottom', bold=True) # pix
+            border.add_widget(lb)
+
+            self.add_operation_categories.add_widget(border)
+        self.add_operation_categories.add_widget(Widget())
 
     def add_operation(self):
         store = JsonStore('VEEP_save.json')
-        self.dismiss()
         operations = []
         try:
             operations = store.get('VEEP')["operations"]
         except KeyError:
             pass
-        finally:
-            value = str((int(100*(eval(self.operation_value.text))-0.5)+1) / 100)
-            if (float(value) % 1 == 0):
-                value = str(int(float(value)))
-            operations.append({'type': self.operation_type, 'value': value})
-            store.put('VEEP', operations=operations)
-
-    def close(self):
-        self.dismiss()
+        except SyntaxError:
+            pass
+        value = str((int(100 * (eval(self.operation_value.text)) - 0.5) + 1) / 100)
+        if (float(value) % 1 == 0):
+            value = str(int(float(value)))
+        operations.append({'type': self.operation_type, 'value': value, 'category': self.operation_category, 'description': self.add_operation_description.text})
+        store.put('VEEP', operations=operations)
+        print(store.get('VEEP')['operations'])
+        self.operation_value.text = ''
+        self.add_operation_description.text = ''
+        self.operation_category = 'Другое'
+        self.screen_manager.current = 'operations'
+        self.update()
 
 class VEEPApp(App):
     def build(self):
