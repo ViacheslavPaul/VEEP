@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.graphics import Color, RoundedRectangle, Ellipse, Rectangle
+from kivy.graphics import Color, RoundedRectangle, Ellipse, Rectangle, Line
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
@@ -15,6 +15,21 @@ class MainLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(**kwargs)
         self.update()
+        # CATEGORIES LIST
+        store = JsonStore('VEEP_save.json')
+        try:
+            operations = store.get('VEEP')["operations"]
+            value = 0
+            for i in operations:
+                if i['type'] == 'add':
+                    value += float(i['value'])
+                elif i['type'] == 'add':
+                    value -= float(i['value'])
+            if value % 1 == 0:
+                value = int(value)
+
+        except KeyError:
+            pass
         self.add_operation_categories.clear_widgets()
         categories_names = ['Продукты', 'Транспорт', 'Культура', 'Обучение', 'Здоровье', 'Досуг', 'Другое']
         categories_images = ['basket.png', 'car.png', 'museum.png', 'brains.png', 'medicine.png', 'flying_snake.png', 'question.png']
@@ -36,6 +51,36 @@ class MainLayout(FloatLayout):
 
             self.add_operation_categories.add_widget(border)
         self.add_operation_categories.add_widget(Widget())
+        # ACCOUNTS LIST
+        self.accounts_list.clear_widgets()
+        accounts_list = [{'icon': 'case.png', 'color': [0.36, 0.5, 0.92], 'name': 'Основной', 'value': str(value)}]
+        for i in accounts_list:
+            border = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3)) # pix
+            border.canvas.add(Color(0.36, 0.5, 0.92))
+            border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size)) # pix
+            img = RelativeLayout(size=(120 / 3, 120 / 3), pos=(24 / 3, 150 / 3)) # pix
+            img.canvas.add(Color(1, 1, 1))
+            img.canvas.add(Ellipse(size=img.size))
+            img.canvas.add(Color(i['color'][0], i['color'][1], i['color'][2]))
+            img.canvas.add(Rectangle(size=(img.size[0]/1.5, img.size[1]/1.5), pos=(img.size[0]/6, img.size[0]/6), source='images/accounts_icons/'+i['icon']))
+            border.add_widget(img)
+
+            value_lb = Label(text=i['value'], bold=True, size_hint=(None, None), size=(288 / 3, 90 / 3), pos=(180 / 3, 180 / 3), font_size=50 / 3) # pix
+            value_lb.text_size = value_lb.size
+            value_lb.halign = 'center'
+            value_lb.valign = 'bottom'
+            value_lb.canvas.add(Color(0.19, 0.19, 0.19))
+            value_lb.canvas.add(Line(width=4 / 3, points=[value_lb.pos[0], value_lb.y, value_lb.width * 1.625, value_lb.y])) # pix
+            border.add_widget(value_lb)
+
+            name_lb = RelativeLayout(size_hint=(None, None), size=(480 / 3, 75 / 3), pos=(0, 15 / 3)) # pix
+            name_lb.canvas.add(Color(0.19, 0.19, 0.19))
+            name_lb.canvas.add(Rectangle(size=name_lb.size, pos=name_lb.pos))
+            lb = Label(text=i['name'], bold=True, pos=(0, 15 / 3), padding=[15 / 3, 0, 15 / 3, 6 / 3])
+            name_lb.add_widget(lb)
+
+            border.add_widget(name_lb)
+            self.accounts_list.add_widget(border)
 
     def update(self):
         store = JsonStore('VEEP_save.json')
@@ -81,14 +126,22 @@ class MainLayout(FloatLayout):
         purpose.canvas.add(Color(0.19, 0.19, 0.19))
         purpose.canvas.add(RoundedRectangle(size=purpose.size, radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3])) # pix
         self.purposes.add_widget(purpose)
+
+    def add_account(self):
+        account = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3)) # pix
+        account.canvas.add(Color(0.19, 0.19, 0.19))
+        account.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=account.size)) # pix
+        self.accounts_list.add_widget(account)
 #--------------------------------------------------------
     cant = False
     def add_action(self, instance):
         marks = ['/', '*', '+', '-']
         if (instance.text == 'С'):
-            self.operation_value.text = ''
+            self.operation_value.text = '0'
         elif (instance.text == '<-'):
             self.operation_value.text = self.operation_value.text[0:len(self.operation_value.text) - 1:]
+            if (self.operation_value.text == ''):
+                self.operation_value.text = '0'
         elif (instance.text == '='):
             try:
                 value = str(eval(self.operation_value.text))
@@ -101,6 +154,7 @@ class MainLayout(FloatLayout):
                 self.operation_value.text = value
             except ZeroDivisionError:
                 self.operation_value.text = 'Ошибка'
+                self.cant = True
             self.cant = True
         elif (instance.text == '%'):
             try:
@@ -111,6 +165,8 @@ class MainLayout(FloatLayout):
             except ValueError:
                 pass
         else:
+            if (self.operation_value.text == '0' and instance.text not in marks):
+                self.operation_value.text = ''
             if (instance.text in marks) and (self.cant == True):
                 self.cant = False
                 self.operation_value.text += instance.text
@@ -199,7 +255,7 @@ class MainLayout(FloatLayout):
         operations.append({'type': self.operation_type, 'value': value, 'category': self.operation_category, 'description': self.add_operation_description.text})
         store.put('VEEP', operations=operations)
         print(store.get('VEEP')['operations'])
-        self.operation_value.text = ''
+        self.operation_value.text = '0'
         self.add_operation_description.text = ''
         self.operation_category = 'Другое'
         self.screen_manager.current = 'operations'

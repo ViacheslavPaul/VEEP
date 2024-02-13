@@ -1,1 +1,1 @@
-{"VEEP": {"operations": [{"type": "add", "value": "2000000", "category": "\u0417\u0430\u0440\u043f\u043b\u0430\u0442\u0430", "description": "\u0417\u043f \u043f\u0440\u0438\u043b\u0435\u0442\u0435\u043b\u0430"}]}}
+{"VEEP": {"operations": [{"type": "add", "value": "2000000", "category": "\u0417\u0430\u0440\u043f\u043b\u0430\u0442\u0430", "description": "\u0417\u043f \u043f\u0440\u0438\u043b\u0435\u0442\u0435\u043b\u0430"}, {"type": "rem", "value": "47", "category": "\u0414\u0440\u0443\u0433\u043e\u0435", "description": ""}]}}
