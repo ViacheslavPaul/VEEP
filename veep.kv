@@ -11,6 +11,7 @@
     operation_value: operation_value
     add_operation_categories: add_operation_categories
     add_operation_description: add_operation_description
+    add_operation_accounts: add_operation_accounts
     type_to_add_button: type_to_add_button
     type_to_rem_button: type_to_rem_button
     accounts_list: accounts_list
@@ -435,30 +436,13 @@
                             size_hint_x: None
                             width: self.minimum_width
                             GridLayout:
+                                id: add_operation_accounts
                                 padding: 45 / 3, 30 / 3, 45 / 3, 15 / 3 # pix
                                 spacing: 30 / 3 # pix
                                 rows: 1
                                 size_hint_y: 0.4
                                 size_hint_x: None
                                 width: self.minimum_width
-                                RelativeLayout:
-                                    size_hint: (None, 1)
-                                    size: (360 / 3, 0) # pix
-                                    canvas.before:
-                                        Color:
-                                            rgba: 0.19, 0.19, 0.19, 1
-                                        RoundedRectangle:
-                                            radius: [30 / 3, 30 / 3, 30 / 3, 30 / 3] # pix
-                                            size: self.size
-                                        Color:
-                                            rgba: 1, 1, 1, 1
-                                        Rectangle:
-                                            pos: (self.size[0] * 0.5 - 50 / 3, self.size[1] * 0.5 - 50 / 3) # pix
-                                            size: (100 / 3, 100 / 3) # pix
-                                            source: 'images/buttons_icons/plus_small.png'
-                                    Button:
-                                        background_color: (0, 0, 0, 0)
-                                        background_normal: ''
                     ScrollView:
                         size_hint: (1, 0.12)
                         pos_hint: {'top': 0.875}

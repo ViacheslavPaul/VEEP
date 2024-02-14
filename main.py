@@ -14,7 +14,6 @@ Window.size = (1080 / 3, 2202 / 3) # del
 class MainLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(**kwargs)
-        self.update()
         # CATEGORIES LIST
         self.add_operation_categories.clear_widgets()
         categories_names = ['Продукты', 'Транспорт', 'Культура', 'Обучение', 'Здоровье', 'Досуг', 'Другое']
@@ -39,16 +38,19 @@ class MainLayout(FloatLayout):
         self.add_operation_categories.add_widget(Widget())
         # ACCOUNTS LIST
         store = JsonStore('VEEP_save.json')
+
+        try:
+            store.get('VEEP')["accounts"]
+        except KeyError:
+            try:
+                operations = store.get('VEEP')["operations"]
+            except KeyError:
+                operations = []
+            store.put('VEEP', accounts=[{'id': '0', 'icon': 'case.png', 'color': '0.36, 0.5, 0.92', 'name': 'Основной', 'value': '0'}], operations=operations)
+
         value = 0
         try:
             operations = store.get('VEEP')["operations"]
-            for i in operations:
-                if i['type'] == 'add':
-                    value += float(i['value'])
-                elif i['type'] == 'rem':
-                    value -= float(i['value'])
-            if value % 1 == 0:
-                value = int(value)
         except KeyError:
             pass
         accounts_list = []
@@ -58,11 +60,9 @@ class MainLayout(FloatLayout):
                 accounts_list.append(i)
         except KeyError:
             pass
-        accounts_list.append({'icon': 'case.png', 'color': '0.36, 0.5, 0.92', 'name': 'Основной', 'value': str(value)})
         self.accounts_list.clear_widgets()
         for i in accounts_list:
             color = i['color'].split(', ')
-            print (color)
             border = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3)) # pix
             border.canvas.add(Color(color[0], color[1], color[2]))
             border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size)) # pix
@@ -98,6 +98,14 @@ class MainLayout(FloatLayout):
         btn = Button(on_press=self.change_screen_to_add_account, background_color=(0, 0, 0, 0))
         border.add_widget(btn)
         self.accounts_list.add_widget(border)
+
+        self.update()
+
+    account_id = '0'
+
+    def change_account_in_operation_add(self, instance):
+        self.account_id = instance.text
+        print(self.account_id)
 
     def change_screen_to_add_account(self, instance):
         self.screen_manager.current = 'add_account'
@@ -141,33 +149,6 @@ class MainLayout(FloatLayout):
         except KeyError:
             pass
 #-----------
-        value = 0
-        try:
-            operations = store.get('VEEP')["operations"]
-            for i in operations:
-                if i['type'] == 'add':
-                    value += float(i['value'])
-                elif i['type'] == 'rem':
-                    value -= float(i['value'])
-            if value % 1 == 0:
-                value = int(value)
-        except KeyError:
-            pass
-        accounts_list = [{'icon': 'case.png', 'color': [0.36, 0.5, 0.92], 'name': 'Основной', 'value': str(value)}]
-        self.accounts_list.clear_widgets()
-        store = JsonStore('VEEP_save.json')
-        value = 0
-        try:
-            operations = store.get('VEEP')["operations"]
-            for i in operations:
-                if i['type'] == 'add':
-                    value += float(i['value'])
-                elif i['type'] == 'rem':
-                    value -= float(i['value'])
-            if value % 1 == 0:
-                value = int(value)
-        except KeyError:
-            pass
         accounts_list = []
         try:
             accounts = store.get('VEEP')["accounts"]
@@ -175,11 +156,30 @@ class MainLayout(FloatLayout):
                 accounts_list.append(i)
         except KeyError:
             pass
-        accounts_list.append({'icon': 'case.png', 'color': '0.36, 0.5, 0.92', 'name': 'Основной', 'value': str(value)})
+        self.add_operation_accounts.clear_widgets()
+        for i in range (len(accounts_list)):
+            color = accounts_list[i]['color'].split(', ')
+            border = RelativeLayout(size_hint=(None, None), size=(283.5 / 3, 189 / 3)) # pix
+            border.canvas.add(Color(color[0], color[1], color[2]))
+            border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size)) # pix
+
+            img = RelativeLayout(size_hint=(None, None), size=(94.5 / 3, 94.5 / 3), pos=(15 / 3, 78 / 3)) # pix
+            img.canvas.add(Color(1, 1, 1))
+            img.canvas.add(Ellipse(size=img.size))
+            img.canvas.add(Color(color[0], color[1], color[2]))
+            img.canvas.add(Rectangle(size=(img.size[0]/1.5, img.size[1]/1.5), pos=(img.size[0]/6, img.size[0]/6), source='images/accounts_icons/'+accounts_list[i]['icon']))
+            border.add_widget(img)
+
+            lb = Label(text=accounts_list[i]['value'], size_hint=(None, None), size=(283.5 / 3, 60 / 3), pos=(0, 9 / 3), padding=[15 / 3, 0, 15 / 3, 0], halign='right', valign='middle', text_size=(283.5 / 3, 60 / 3), bold=True) # pix
+            border.add_widget(lb)
+
+            btn = Button(on_press=self.change_account_in_operation_add, text=accounts_list[i]['id'], font_size=0, background_color=(0, 0, 0, 0))
+            border.add_widget(btn)
+
+            self.add_operation_accounts.add_widget(border)
         self.accounts_list.clear_widgets()
         for i in accounts_list:
             color = i['color'].split(', ')
-            print (color)
             border = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3)) # pix
             border.canvas.add(Color(color[0], color[1], color[2]))
             border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size)) # pix
@@ -190,7 +190,7 @@ class MainLayout(FloatLayout):
             img.canvas.add(Rectangle(size=(img.size[0]/1.5, img.size[1]/1.5), pos=(img.size[0]/6, img.size[0]/6), source='images/accounts_icons/'+i['icon']))
             border.add_widget(img)
 
-            value_lb = Label(text=str(value), bold=True, size_hint=(None, None), size=(288 / 3, 90 / 3), pos=(180 / 3, 180 / 3), font_size=50 / 3) # pix
+            value_lb = Label(text=i['value'], bold=True, size_hint=(None, None), size=(288 / 3, 90 / 3), pos=(180 / 3, 180 / 3), font_size=50 / 3) # pix
             value_lb.text_size = value_lb.size
             value_lb.halign = 'center'
             value_lb.valign = 'bottom'
@@ -216,15 +216,6 @@ class MainLayout(FloatLayout):
         border.add_widget(btn)
         self.accounts_list.add_widget(border)
 
-        border = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3))  # pix
-        border.canvas.add(Color(0.19, 0.19, 0.19))
-        border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size)) # pix
-        border.canvas.add(Color(1, 1, 1))
-        border.canvas.add(Rectangle(size=(100 / 3, 100 / 3), pos=(190 / 3, 100 / 3), source='images/buttons_icons/plus_small.png')) # pix
-        btn = Button(on_press=self.change_screen_to_add_account, background_color=(0, 0, 0, 0))
-        border.add_widget(btn)
-        self.accounts_list.add_widget(border)
-
     add_account_icon = ''
     add_account_color = ''
     def add_account(self):
@@ -234,8 +225,6 @@ class MainLayout(FloatLayout):
         store = JsonStore('VEEP_save.json')
         accounts = []
         operations = []
-        print (color)
-        print (icon)
         try:
             accounts = store.get('VEEP')["accounts"]
         except KeyError:
@@ -244,9 +233,10 @@ class MainLayout(FloatLayout):
             operations = store.get('VEEP')["operations"]
         except KeyError:
             pass
-        accounts.append({'icon': icon, 'color': color, 'name': name})
+        accounts.append({'id': str(len(accounts)), 'icon': icon, 'color': color, 'name': name, 'value': '0'})
         store.put('VEEP', accounts=accounts, operations=operations)
-        print ('123')
+        self.screen_manager.current = 'accounts'
+        self.update()
 
     def add_purpose(self):
         purpose = RelativeLayout(size_hint=(None, None), size=(480 / 3, self.purposes.size[1] - 60 / 3)) # pix
@@ -304,7 +294,6 @@ class MainLayout(FloatLayout):
 
     def change_category(self, instance):
         self.operation_category = instance.text
-        print (self.operation_category)
 
     operation_type = 'rem'
     operation_category = 'Другое'
@@ -367,6 +356,7 @@ class MainLayout(FloatLayout):
     def add_operation(self):
         store = JsonStore('VEEP_save.json')
         operations = []
+        accounts = []
         try:
             operations = store.get('VEEP')["operations"]
         except KeyError:
@@ -380,14 +370,18 @@ class MainLayout(FloatLayout):
                 value = str((int(100 * (eval(self.operation_value.text)) - 0.5) + 1) / 100)
             if (float(value) % 1 == 0):
                 value = str(int(float(value)))
-            operations.append({'type': self.operation_type, 'value': value, 'category': self.operation_category,
-                               'description': self.add_operation_description.text})
+            operations.append({'type': self.operation_type, 'value': value, 'category': self.operation_category, 'description': self.add_operation_description.text})
             try:
                 accounts = store.get('VEEP')["accounts"]
             except KeyError:
                 pass
+            for i in range (len(accounts)):
+                if accounts[i]['id'] == self.account_id:
+                    acc = accounts[i]
+            acc['value'] = value
+            accounts.remove(acc)
+            accounts.insert(0, acc)
             store.put('VEEP', accounts=accounts, operations=operations)
-            print(store.get('VEEP')['operations'])
             self.operation_value.text = '0'
             self.add_operation_description.text = ''
             self.operation_category = 'Другое'
