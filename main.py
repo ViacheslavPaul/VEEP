@@ -378,7 +378,9 @@ class MainLayout(FloatLayout):
             for i in range (len(accounts)):
                 if accounts[i]['id'] == self.account_id:
                     acc = accounts[i]
-            acc['value'] = value
+            acc['value'] = str(float(acc['value']) + float(value))
+            if (float(acc['value']) % 1 == 0):
+                acc['value'] = str(int(float(acc['value'])))
             accounts.remove(acc)
             accounts.insert(0, acc)
             store.put('VEEP', accounts=accounts, operations=operations)
