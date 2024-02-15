@@ -31,7 +31,7 @@ class MainLayout(FloatLayout):
             img.canvas.add(Rectangle(pos=(img.size[0] / 2 - 37.5 / 3, img.size[0] / 2 - 37.5 / 3), size=(75 / 3, 75 / 3), source='images/categories_icons/'+categories_images[i])) # pix
             border.add_widget(img)
 
-            lb = Label(text=categories_names[i], size=(200, 0), pos_hint={'center_x': 0.5, 'y': -0.1}, text_size=(200, 159 / 3), font_size= 40 / 3, halign='center', valign='bottom', bold=True) # pix
+            lb = Label(text=categories_names[i], size=(300 / 3, 0), pos_hint={'center_x': 0.5, 'y': -0.1}, text_size=(300 / 3, 159 / 3), font_size= 40 / 3, halign='center', valign='bottom', bold=True) # pix
             border.add_widget(lb)
 
             self.add_operation_categories.add_widget(border)
@@ -46,7 +46,7 @@ class MainLayout(FloatLayout):
                 operations = store.get('VEEP')["operations"]
             except KeyError:
                 operations = []
-            store.put('VEEP', accounts=[{'id': '0', 'icon': 'case.png', 'color': '0.36, 0.5, 0.92', 'name': 'Основной', 'value': '0'}], operations=operations)
+            store.put('VEEP', accounts=[{'id': '0', 'icon': 'case.png', 'color': '0.44, 0.54, 0.92', 'name': 'Основной', 'value': '0'}], operations=operations)
 
         value = 0
         try:
@@ -105,7 +105,6 @@ class MainLayout(FloatLayout):
 
     def change_account_in_operation_add(self, instance):
         self.account_id = instance.text
-        print(self.account_id)
 
     def change_screen_to_add_account(self, instance):
         self.screen_manager.current = 'add_account'
@@ -114,15 +113,60 @@ class MainLayout(FloatLayout):
         store = JsonStore('VEEP_save.json')
         try:
             operations = store.get('VEEP')["operations"]
-            self.operations_list.clear_widgets()
+            # self.operations_list.clear_widgets()
             for i in range (len(operations)):
-                layout = RelativeLayout(size_hint_y=None, size=(1, 225 / 3)) # pix
-                layout.add_widget(Button())
-                layout.add_widget(Label(text=str(operations[i]['type']), size_hint=(0.5, 0.5)))
-                layout.add_widget(Label(text=str(operations[i]['value']), size_hint=(0.5, 0.5), pos_hint={'right': 1}))
-                layout.add_widget(Label(text=str(operations[i]['category']), size_hint=(0.5, 0.5), pos_hint={'top': 1}))
-                layout.add_widget(Label(text=str(operations[i]['description']), size_hint=(0.5, 0.5), pos_hint={'top': 1, 'right': 1}))
-                self.operations_list.add_widget(layout)
+                type = operations[i]['type']
+                if type == 'rem':
+                    border_color = [1, 0.15, 0.15]
+                    categories_names = ['Продукты', 'Транспорт', 'Культура', 'Обучение', 'Здоровье', 'Досуг', 'Другое']
+                    categories_images = ['basket.png', 'car.png', 'museum.png', 'brains.png', 'medicine.png', 'flying_snake.png', 'question.png']
+                    categories_colors = [[0.91, 0.45, 0.5], [0.26, 0.19, 0.54], [0.27, 0.58, 0.29], [1, 0.63, 0], [0.7, 0.16, 0.13], [0.47, 0.87, 0.91], [0, 0.19, 0.33]]
+                elif type == 'add':
+                    border_color = [0.15, 0.85, 0.15]
+                    categories_names = ['Зарплата', 'Пенсия', 'Подарок']
+                    categories_images = ['coins.png', 'letter.png', 'prize.png']
+                    categories_colors = [[1, 0.84, 0], [0.24, 0.37, 0.54], [0.84, 0.19, 0.2]]
+                value = operations[i]['value']
+                category = operations[i]['category']
+                description = operations[i]['description']
+                for j in range (len(categories_names)):
+                    if categories_names[j] == category:
+                        name = categories_names[j]
+                        color = categories_colors[j]
+                        icon = categories_images[j]
+                        break
+
+                border = RelativeLayout(size_hint=(None, None), size=(990 / 3, 225 / 3)) # pix
+                border.canvas.add(Color(border_color[0], border_color[1], border_color[2]))
+                border.canvas.add(Line(width=6 / 3, points=[border.width * 0.3, 0, border.width * 0.7, 0])) # pix
+                border.canvas.add(Line(width=6 / 3, points=[border.width * 0.3, border.height, border.width * 0.7, border.height])) # pix
+                border.canvas.add(Line(width=6 / 3, points=[0, border.height * 0.3, 0, border.height * 0.7])) # pix
+                border.canvas.add(Line(width=6 / 3, points=[border.width, border.height * 0.3, border.width, border.height * 0.7])) # pix
+                border.canvas.add(Color(0.19, 0.19, 0.19))
+                border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size))
+
+                img = RelativeLayout(size_hint=(None, None), size=(123.75 / 3, 123.75 / 3), pos=(64.35 / 3, 73.125 / 3)) # pix
+                img.canvas.add(Color(color[0], color[1], color[2]))
+                img.canvas.add(Ellipse(size=img.size))
+                img.canvas.add(Color(2, 2, 2))
+                img.canvas.add(Rectangle(size=(img.size[0] / 1.5, img.size[0] / 1.5), pos=(img.size[0] / 6, img.size[0] / 6), source='images/categories_icons/'+icon))
+                border.add_widget(img)
+
+                name_lb = Label(text=name, size=(300 / 3, 0), pos_hint={'center_x': 0.1275, 'y': -0.05}, text_size=(300 / 3, 159 / 3), font_size=40 / 3, halign='center', valign='bottom', bold=True) # pix
+                border.add_widget(name_lb)
+
+                value_lb = Label(text=value, size_hint=(None, None), size=(742.5 / 3, 112.5 / 3), pos=(247.5 / 3, 112.5 / 3), bold=True, valign='bottom', halign='center', font_size=60 / 3) # pix
+                value_lb.canvas.add(Color(0.12, 0.12, 0.12))
+                value_lb.canvas.add(Line(width=4 / 3, points=[value_lb.pos[0], value_lb.pos[1] + 21 / 3, value_lb.size[0] * 1.3, value_lb.pos[1] + 21 / 3])) # pix
+                border.add_widget(value_lb)
+
+                description_lb = Label(text=description, size_hint=(None, None), size=(742.5 / 3, 112.5 / 3), pos=(247.5 / 3, 0), font_size=45 / 3, valign='middle', halign='center', color=(0.75, 0.75, 0.75)) # pix
+                description_lb.canvas.add(Color(0.12, 0.12, 0.12))
+                description_lb.canvas.add(Line(width=4 / 3, points=[description_lb.pos[0], description_lb.pos[1] + 21 / 3, description_lb.size[0] * 1.3, description_lb.pos[1] + 21 / 3])) # pix
+                border.add_widget(description_lb)
+
+                self.operations_list.add_widget(border)
+
             summ = 0
             for i in operations:
                 if i['type'] == 'add':
@@ -216,8 +260,9 @@ class MainLayout(FloatLayout):
         border.add_widget(btn)
         self.accounts_list.add_widget(border)
 
-    add_account_icon = ''
-    add_account_color = ''
+    add_account_icon = 'case.png'
+    add_account_color = '0.44, 0.54, 0.92'
+    example_add_account_name = ''
     def add_account(self):
         name = self.add_account_name.text
         color = self.add_account_color
@@ -235,6 +280,9 @@ class MainLayout(FloatLayout):
             pass
         accounts.append({'id': str(len(accounts)), 'icon': icon, 'color': color, 'name': name, 'value': '0'})
         store.put('VEEP', accounts=accounts, operations=operations)
+        self.add_account_name.text = ''
+        self.add_account_icon = 'case.png'
+        self.add_account_color = '0.44, 0.54, 0.92'
         self.screen_manager.current = 'accounts'
         self.update()
 
@@ -247,16 +295,33 @@ class MainLayout(FloatLayout):
 #--------------------------------------------------------
     cant = False
     def add_action(self, instance):
-        marks = ['/', '*', '+', '-']
+        marks = ['/', '*', '+', '-', '.']
         if (instance.text == 'С'):
             self.operation_value.text = '0'
         elif (instance.text == '<-'):
             self.operation_value.text = self.operation_value.text[0:len(self.operation_value.text) - 1:]
             if (self.operation_value.text == ''):
                 self.operation_value.text = '0'
+        elif (instance.text == '.'):
+            text = self.operation_value.text
+            if (self.operation_value.text[len(self.operation_value.text) - 1] not in marks):
+                text = text.replace('/', '_')
+                text = text.replace('*', '_')
+                text = text.replace('+', '_')
+                text = text.replace('-', '_')
+                text = text.split('_')
+                text = text[len(text) - 1]
+                if text.find('.') < 0:
+                    if (self.operation_value.text == '0' and instance.text not in marks and instance.text != '.'):
+                        self.operation_value.text = ''
+                    self.operation_value.text += '.'
         elif (instance.text == '='):
             try:
-                value = str(eval(self.operation_value.text))
+                value = eval(self.operation_value.text)
+                if (float(value) % 1 == 0):
+                    value = str(int(float(value)))
+                else:
+                    value = str((int(100 * value - 0.5) + 1) / 100)
                 if (float(value) != 0):
                     self.operation_value.text = value
                 else:
@@ -272,14 +337,22 @@ class MainLayout(FloatLayout):
                 pass
         elif (instance.text == '%'):
             try:
-                buf = []
-                for i in marks:
-                    buf.append(self.operation_value.text.rfind(i))
-                self.operation_value.text = self.operation_value.text[:len(self.operation_value.text) - (len(self.operation_value.text) - max(buf) - 1):] + str((int(1000000*(float(self.operation_value.text[max(buf) + 1::]) * 0.01)-0.5)+1)/1000000)
+                text = self.operation_value.text
+                text = text.replace('/', '_')
+                text = text.replace('*', '_')
+                text = text.replace('+', '_')
+                text = text.replace('-', '_')
+                text = text.split('_')
+                new_text = str((int(10000 * (float(text[len(text) - 1]) * 0.01) - 0.5) + 1) / 10000)
+                text = text[len(text) - 1]
+                print (text)
+                print (new_text)
+                print (self.operation_value.text[:len(self.operation_value.text) - len(text)])
+                self.operation_value.text = self.operation_value.text[:len(self.operation_value.text) - len(text)] + new_text
             except ValueError:
                 pass
         else:
-            if (self.operation_value.text == '0' and instance.text not in marks):
+            if (self.operation_value.text == '0' and instance.text not in marks and instance.text != '.'):
                 self.operation_value.text = ''
             if (instance.text in marks) and (self.cant == True):
                 self.cant = False
@@ -299,6 +372,7 @@ class MainLayout(FloatLayout):
     operation_category = 'Другое'
     def operation_type_to_add(self, instance):
         self.operation_type = 'add'
+        self.operation_category = 'Зарплата'
         instance.background_color = (0.15, 0.85, 0.15, 1)
         instance.color = (1, 1, 1, 1)
         self.type_to_rem_button.background_color = (0, 0, 0, 0)
@@ -327,6 +401,7 @@ class MainLayout(FloatLayout):
 
     def operation_type_to_rem(self, instance):
         self.operation_type = 'rem'
+        self.operation_category = 'Другое'
         instance.background_color = (1, 0.15, 0.15, 1)
         instance.color = (1, 1, 1, 1)
         self.type_to_add_button.background_color = (0, 0, 0, 0)
@@ -364,33 +439,139 @@ class MainLayout(FloatLayout):
         except SyntaxError:
             pass
         try:
-            if eval(self.operation_value.text) == 0:
-                value = '0'
-            else:
+            if eval(self.operation_value.text) != 0:
                 value = str((int(100 * (eval(self.operation_value.text)) - 0.5) + 1) / 100)
-            if (float(value) % 1 == 0):
-                value = str(int(float(value)))
-            operations.append({'type': self.operation_type, 'value': value, 'category': self.operation_category, 'description': self.add_operation_description.text})
-            try:
-                accounts = store.get('VEEP')["accounts"]
-            except KeyError:
-                pass
-            for i in range (len(accounts)):
-                if accounts[i]['id'] == self.account_id:
-                    acc = accounts[i]
-            acc['value'] = str(float(acc['value']) + float(value))
-            if (float(acc['value']) % 1 == 0):
-                acc['value'] = str(int(float(acc['value'])))
-            accounts.remove(acc)
-            accounts.insert(0, acc)
-            store.put('VEEP', accounts=accounts, operations=operations)
-            self.operation_value.text = '0'
-            self.add_operation_description.text = ''
-            self.operation_category = 'Другое'
-            self.screen_manager.current = 'operations'
-            self.update()
+                if (float(value) % 1 == 0):
+                    value = str(int(float(value)))
+                operations.append({'type': self.operation_type, 'value': value, 'category': self.operation_category, 'description': self.add_operation_description.text})
+                try:
+                    accounts = store.get('VEEP')["accounts"]
+                except KeyError:
+                    pass
+                for i in range (len(accounts)):
+                    if accounts[i]['id'] == self.account_id:
+                        acc = accounts[i]
+                if self.operation_type == 'add':
+                    acc['value'] = str(float(acc['value']) + float(value))
+                elif self.operation_type == 'rem':
+                    acc['value'] = str(float(acc['value']) - float(value))
+                if (float(acc['value']) % 1 == 0):
+                    acc['value'] = str(int(float(acc['value'])))
+                accounts.remove(acc)
+                accounts.insert(0, acc)
+                store.put('VEEP', accounts=accounts, operations=operations)
+                self.operation_value.text = '0'
+                self.add_operation_description.text = ''
+                self.operation_category = 'Другое'
+                self.screen_manager.current = 'operations'
+                self.update()
+            else:
+                self.operation_value.text = 'Укажите число больше "0"'
+                self.cant = True
         except SyntaxError:
             pass
+
+    def change_account_icon_in_account_add(self, icon):
+        self.add_account_icon = icon
+        color = self.add_account_color.split(', ')
+
+        self.add_account_example_border_border.clear_widgets()
+        border = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3)) # pix
+        border.canvas.add(Color(color[0], color[1], color[2]))
+        border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size))  # pix
+        img = RelativeLayout(size=(120 / 3, 120 / 3), pos=(24 / 3, 150 / 3))  # pix
+        img.canvas.add(Color(1, 1, 1))
+        img.canvas.add(Ellipse(size=img.size))
+        img.canvas.add(Color(color[0], color[1], color[2]))
+        img.canvas.add(Rectangle(size=(img.size[0] / 1.5, img.size[1] / 1.5), pos=(img.size[0] / 6, img.size[0] / 6), source='images/accounts_icons/' + icon))
+        border.add_widget(img)
+
+        value_lb = Label(text='0', bold=True, size_hint=(None, None), size=(288 / 3, 90 / 3), pos=(180 / 3, 180 / 3), font_size=50 / 3)  # pix
+        value_lb.text_size = value_lb.size
+        value_lb.halign = 'center'
+        value_lb.valign = 'bottom'
+        value_lb.canvas.add(Color(0.19, 0.19, 0.19))
+        value_lb.canvas.add(Line(width=4 / 3, points=[value_lb.pos[0], value_lb.y, value_lb.width * 1.6, value_lb.y])) # pix
+        border.add_widget(value_lb)
+
+        name_lb = RelativeLayout(size_hint=(None, None), size=(480 / 3, 75 / 3), pos=(0, 15 / 3))  # pix
+        name_lb.canvas.add(Color(0.19, 0.19, 0.19))
+        name_lb.canvas.add(Rectangle(size=name_lb.size, pos=name_lb.pos))
+        lb = Label(text=self.example_add_account_name, bold=True, pos=(0, 15 / 3), padding=[15 / 3, 0, 15 / 3, 6 / 3]) # pix
+        name_lb.add_widget(lb)
+
+        border.add_widget(name_lb)
+        self.add_account_example_border_border.add_widget(border)
+
+    def change_account_color_in_account_add(self, color):
+        self.add_account_color = color
+        icon = self.add_account_icon
+        color = color.split(', ')
+
+        self.add_account_example_border_border.clear_widgets()
+        border = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3)) # pix
+        border.canvas.add(Color(color[0], color[1], color[2]))
+        border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size)) # pix
+        img = RelativeLayout(size=(120 / 3, 120 / 3), pos=(24 / 3, 150 / 3)) # pix
+        img.canvas.add(Color(1, 1, 1))
+        img.canvas.add(Ellipse(size=img.size))
+        img.canvas.add(Color(color[0], color[1], color[2]))
+        img.canvas.add(Rectangle(size=(img.size[0] / 1.5, img.size[1] / 1.5), pos=(img.size[0] / 6, img.size[0] / 6), source='images/accounts_icons/' + icon))
+        border.add_widget(img)
+
+        value_lb = Label(text='0', bold=True, size_hint=(None, None), size=(288 / 3, 90 / 3), pos=(180 / 3, 180 / 3), font_size=50 / 3) # pix
+        value_lb.text_size = value_lb.size
+        value_lb.halign = 'center'
+        value_lb.valign = 'bottom'
+        value_lb.canvas.add(Color(0.19, 0.19, 0.19))
+        value_lb.canvas.add(Line(width=4 / 3, points=[value_lb.pos[0], value_lb.y, value_lb.width * 1.6, value_lb.y])) # pix
+        border.add_widget(value_lb)
+
+        name_lb = RelativeLayout(size_hint=(None, None), size=(480 / 3, 75 / 3), pos=(0, 15 / 3)) # pix
+        name_lb.canvas.add(Color(0.19, 0.19, 0.19))
+        name_lb.canvas.add(Rectangle(size=name_lb.size, pos=name_lb.pos))
+        lb = Label(text=self.example_add_account_name, bold=True, pos=(0, 15 / 3), padding=[15 / 3, 0, 15 / 3, 6 / 3]) # pix
+        name_lb.add_widget(lb)
+
+        border.add_widget(name_lb)
+        self.add_account_example_border_border.add_widget(border)
+
+    def change_account_name_in_account_add(self):
+        self.example_add_account_name = self.add_account_name.text
+        color = self.add_account_color
+        icon = self.add_account_icon
+
+        self.add_account_color = color
+        icon = self.add_account_icon
+        color = color.split(', ')
+
+        self.add_account_example_border_border.clear_widgets()
+        border = RelativeLayout(size_hint=(None, None), size=(480 / 3, 300 / 3)) # pix
+        border.canvas.add(Color(color[0], color[1], color[2]))
+        border.canvas.add(RoundedRectangle(radius=[30 / 3, 30 / 3, 30 / 3, 30 / 3], size=border.size)) # pix
+        img = RelativeLayout(size=(120 / 3, 120 / 3), pos=(24 / 3, 150 / 3))  # pix
+        img.canvas.add(Color(1, 1, 1))
+        img.canvas.add(Ellipse(size=img.size))
+        img.canvas.add(Color(color[0], color[1], color[2]))
+        img.canvas.add(Rectangle(size=(img.size[0] / 1.5, img.size[1] / 1.5), pos=(img.size[0] / 6, img.size[0] / 6), source='images/accounts_icons/' + icon))
+        border.add_widget(img)
+
+        value_lb = Label(text='0', bold=True, size_hint=(None, None), size=(288 / 3, 90 / 3), pos=(180 / 3, 180 / 3), font_size=50 / 3) # pix
+        value_lb.text_size = value_lb.size
+        value_lb.halign = 'center'
+        value_lb.valign = 'bottom'
+        value_lb.canvas.add(Color(0.19, 0.19, 0.19))
+        value_lb.canvas.add(Line(width=4 / 3, points=[value_lb.pos[0], value_lb.y, value_lb.width * 1.6, value_lb.y])) # pix
+        border.add_widget(value_lb)
+
+        name_lb = RelativeLayout(size_hint=(None, None), size=(480 / 3, 75 / 3), pos=(0, 15 / 3)) # pix
+        name_lb.canvas.add(Color(0.19, 0.19, 0.19))
+        name_lb.canvas.add(Rectangle(size=name_lb.size, pos=name_lb.pos))
+        lb = Label(text=self.example_add_account_name, bold=True, pos=(0, 15 / 3), padding=[15 / 3, 0, 15 / 3, 6 / 3]) # pix
+        name_lb.add_widget(lb)
+
+        border.add_widget(name_lb)
+        self.add_account_example_border_border.add_widget(border)
 
 class VEEPApp(App):
     def build(self):
