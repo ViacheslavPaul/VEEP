@@ -11,11 +11,9 @@ from kivy.core.window import Window # del
 Window.size = (1080 / 3, 2202 / 3) # del
 
 from datetime import date
-import numpy as np
-from matplotlib import pyplot as plt
-from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
 class MainLayout(FloatLayout):
+
     account_id = '0'
 
     add_account_icon = 'case.png'
