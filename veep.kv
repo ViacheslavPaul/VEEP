@@ -2,6 +2,7 @@
 #:import Factory kivy.factory.Factory
 
 <MainLayout>:
+# IDS
     purposes_list: purposes_list
     screen_manager: screen_manager
     main_income_info: main_income_info
@@ -28,7 +29,7 @@
         transition: NoTransition()
         id: screen_manager
         name: 'screen_manager'
-    
+# ALL
     # MAIN PAGE
         Screen:
             name: 'main'
@@ -276,8 +277,6 @@
                 Rectangle:
                     pos: self.pos
                     size: self.size
-            Button:
-                text: 'graphs'
 
     # OPERATIONS PAGE
         Screen:

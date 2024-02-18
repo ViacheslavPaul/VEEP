@@ -148,7 +148,6 @@ class MainLayout(FloatLayout):
         self.screen_manager.current = 'add_purpose'
 
     def update(self):
-        self.date = str(date.today()).split('-')
         store = JsonStore('VEEP_save.json')
         try:
             purposes = store.get('VEEP')["purposes"]
