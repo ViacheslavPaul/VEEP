@@ -2,7 +2,7 @@
 #:import Factory kivy.factory.Factory
 
 <MainLayout>:
-    purposes: purposes
+    purposes_list: purposes_list
     screen_manager: screen_manager
     main_income_info: main_income_info
     main_expenses_info: main_expenses_info
@@ -19,6 +19,10 @@
     add_account_example_icon: add_account_example_icon
     add_account_example_border: add_account_example_border
     add_account_example_border_border: add_account_example_border_border
+    add_purpose_name: add_purpose_name
+    add_purpose_example_border_border: add_purpose_example_border_border
+    add_purpose_end_summ: add_purpose_end_summ
+    period_lb: period_lb
 
     ScreenManager:
         transition: NoTransition()
@@ -206,32 +210,13 @@
                         size_hint_x: None
                         width: self.minimum_width
                         GridLayout:
-                            id: purposes
+                            id: purposes_list
                             padding: 45 / 3, 30 / 3, 45 / 3, 30 / 3 # pix
                             spacing: 30 / 3 # pix
                             rows: 1
                             size_hint_y: 0.4
                             size_hint_x: None
                             width: self.minimum_width
-                            RelativeLayout:
-                                size_hint: (None, 1)
-                                size: (480 / 3, 0) # pix
-                                canvas.before:
-                                    Color:
-                                        rgba: 0.19, 0.19, 0.19, 1
-                                    RoundedRectangle:
-                                        radius: [30 / 3, 30 / 3, 30 / 3, 30 / 3] # pix
-                                        size: self.size
-                                    Color:
-                                        rgba: 1, 1, 1, 1
-                                    Rectangle:
-                                        pos: (self.size[0] * 0.5 - 50 / 3, self.size[1] * 0.5 - 50 / 3) # pix
-                                        size: (100 / 3, 100 / 3) # pix
-                                        source: 'images/buttons_icons/plus_small.png'
-                                Button:
-                                    on_press: root.add_purpose()
-                                    background_color: (0, 0, 0, 0)
-                                    background_normal: ''
 
             AnchorLayout:
                 anchor_x: 'center'
@@ -596,6 +581,463 @@
                                 bold: True
                                 background_color: 0, 0, 0, 0
                                 color: 1, 0.5, 0.15, 1
+
+    # ADD PURPOSE SCREEN
+        Screen:
+            name: 'add_purpose'
+            size_hint: (1, 1)
+            canvas.before:
+                Color:
+                    rgba: 0.118, 0.118, 0.118, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            RelativeLayout:
+                on_touch_down: root.change_purpose_name_in_purpose_add()
+                RelativeLayout:
+                    id: add_purpose_example_border_border
+                    size_hint: (None, None)
+                    size: (480 / 3, 300 / 3) # pix
+                    pos_hint: {'y': 0.7, 'center_x': 0.5}
+                    RelativeLayout:
+                        canvas.before:
+                            Color:
+                                rgba: 0.19, 0.19, 0.19, 1
+                            RoundedRectangle:
+                                radius: [30 / 3, 30 / 3, 30 / 3, 30 / 3] # pix
+                                size: self.size
+                        RelativeLayout:
+                            size_hint: (0.25, None)
+                            height: self.size[0]
+                            pos_hint: {'top': 0.9, 'x': 0.05}
+                            canvas.before:
+                                Color:
+                                    rgba: 0.44, 0.54, 0.92, 1
+                                Ellipse:
+                                    size: self.size
+                                Color:
+                                    rgba: 1, 1, 1, 1
+                                Rectangle:
+                                    size: (self.width * 0.6, self.height * 0.6)
+                                    pos: (self.pos[0], self.pos[0])
+                                    source: 'images/accounts_icons/case.png'
+                        RelativeLayout:
+                            size_hint: (0.6, 0.3)
+                            pos_hint: {'right': 0.95, 'top': 0.85}
+                            canvas.before:
+                                Color:
+                                    rgba: 0.07, 0.07, 0.07, 1
+                                Line:
+                                    width: 4 / 3 # pix
+                                    points: [0, 18 / 3, 285 / 3, 18 / 3] # pix
+                            Label:
+                                text: ''
+                                color: 0.9, 0.9, 0.9, 1
+                                bold: True
+
+                        RelativeLayout:
+                            size_hint: (0.9, 0.2)
+                            pos_hint: {'right': 0.95, 'y': 0.225}
+                            Label:
+                                text: '0 / '
+                                bold: True
+                                color: 0.9, 0.9, 0.9, 1
+
+                        RelativeLayout:
+                            size_hint: (None, None)
+                            size: (432 / 3, 21 / 3) # pix
+                            pos_hint: {'center_x': 0.5, 'y': 0.1}
+                            canvas.before:
+                                Color:
+                                    rgba: 0.55, 0.55, 0.55, 1
+                                Rectangle:
+                                    size: self.size
+                                Color:
+                                    rgba: 0.44, 0.54, 0.92, 1
+                                Rectangle:
+                                    size: (300 / 3, 21 / 3) # pix
+
+                TextInput:
+                    id: add_purpose_name
+                    hint_text: 'Название'
+                    size_hint: (1, 0.05)
+                    pos_hint: {'top': 0.7}
+                    font_size: 56 / 3 # pix
+                    padding: 45 / 3, 30 / 3, 45 / 3, 0 # pix
+                    foreground_color: 1, 1, 1, 1
+                    background_color: 0, 0, 0, 0
+                    cursor_color: 1, 1, 1, 1
+                    canvas.before:
+                        Color:
+                            rgba: 0.8, 0.8, 0.8, 1
+                        Line:
+                            width: 3 / 3 # pix
+                            points: self.pos[0] + 30 / 3, self.y, self.size[0] - 30 / 3, self.y # pix
+
+                TextInput:
+                    id: add_purpose_end_summ
+                    hint_text: 'Конечная сумма'
+                    size_hint: (1, 0.05)
+                    pos_hint: {'top': 0.65}
+                    font_size: 56 / 3 # pix
+                    padding: 45 / 3, 30 / 3, 45 / 3, 0 # pix
+                    foreground_color: 1, 1, 1, 1
+                    background_color: 0, 0, 0, 0
+                    cursor_color: 1, 1, 1, 1
+                    canvas.before:
+                        Color:
+                            rgba: 0.8, 0.8, 0.8, 1
+                        Line:
+                            width: 3 / 3 # pix
+                            points: self.pos[0] + 30 / 3, self.y, self.size[0] - 30 / 3, self.y # pix
+
+                ScrollView:
+                    size_hint: (1, 0.09)
+                    pos_hint: {'top': 0.58}
+                    do_scroll_y: False
+                    bar_color: (0, 0, 0, 0)
+                    bar_inactive_color: (0, 0, 0, 0)
+                    BoxLayout:
+                        orientation: "vertical"
+                        size_hint_x: None
+                        width: self.minimum_width
+                        GridLayout:
+                            padding: 45 / 3, 15 / 3, 45 / 3, 15 / 3 # pix
+                            spacing: 60 / 3 # pix
+                            rows: 1
+                            size_hint_y: 0.4
+                            size_hint_x: None
+                            width: self.minimum_width
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/a.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('a.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/b.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('b.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/c.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('c.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/d.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('d.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/j.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('j.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/p.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('p.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/s.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('s.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/bag.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('bag.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/cart.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('cart.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/case.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('case.png')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.19, 0.19, 0.19, 1
+                                    Ellipse:
+                                        size: self.size
+                                    Color:
+                                        rgba: 2, 2, 2, 1
+                                    Rectangle:
+                                        size: (self.size[0] * 0.5, self.size[0] * 0.5)
+                                        pos: (self.size[0] / 4, self.size[1] / 4)
+                                        source: 'images/accounts_icons/check.png'
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_icon_in_purpose_add('check.png')
+                ScrollView:
+                    size_hint: (1, 0.075)
+                    pos_hint: {'top': 0.49}
+                    do_scroll_y: False
+                    bar_color: (0, 0, 0, 0)
+                    bar_inactive_color: (0, 0, 0, 0)
+                    BoxLayout:
+                        orientation: "vertical"
+                        size_hint_x: None
+                        width: self.minimum_width
+                        GridLayout:
+                            padding: 45 / 3, 15 / 3, 45 / 3, 15 / 3 # pix
+                            spacing: 30 / 3 # pix
+                            rows: 1
+                            size_hint_y: 0.4
+                            size_hint_x: None
+                            width: self.minimum_width
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.88, 0.17, 0.15, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.88, 0.17, 0.15')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.96, 0.4, 0.08, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.96, 0.4, 0.08')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.96, 0.56, 0.09, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.96, 0.56, 0.09')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 1, 0.72, 0.01, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('1, 0.72, 0.01')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.67, 0.82, 0.35, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.67, 0.82, 0.35')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.61, 0.71, 0.22, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.61, 0.71, 0.22')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.48, 0.71, 0.22, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.48, 0.71, 0.22')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.29, 0.6, 0.7, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.29, 0.6, 0.7')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.44, 0.68, 0.91, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.44, 0.68, 0.91')
+                            RelativeLayout:
+                                size_hint: (None, 1)
+                                size: (self.size[1], self.size[1])
+                                canvas.before:
+                                    Color:
+                                        rgba: 0.44, 0.54, 0.92, 1
+                                    Ellipse:
+                                        size: self.size
+                                Button:
+                                    background_color: 0, 0, 0, 0
+                                    on_press: root.change_purpose_color_in_purpose_add('0.44, 0.54, 0.92')
+            Button:
+                text: 'Создать'
+                font_size: 60 / 3 # pix
+                bold: True
+                size_hint: (0.8, 0.08)
+                pos_hint: {'top': 0.35, 'x': 0.1}
+                background_color: 0, 0, 0, 0
+                on_press: root.add_purpose()
+                canvas.before:
+                    Color:
+                        rgba: 0.16, 0.53, 0.87, 1
+                    RoundedRectangle:
+                        radius: [30 / 3, 30 / 3, 30 / 3, 30 / 3] # pix
+                        size: self.size
+                        pos: self.pos
+
 
     # ADD ACCOUNT SCREEN
         Screen:
@@ -1032,38 +1474,44 @@
                         size: self.size
                         pos: self.pos
 
-
-# DATE
-    FloatLayout:
+# PERIOD
+    RelativeLayout:
         pos_hint: {'top': 1}
         size_hint: (1, 0.075)
         canvas.before:
             Color:
                 rgba: 0.075, 0.075, 0.075, 1
             Rectangle:
-                pos: self.pos
                 size: self.size
-        Button:
-            pos_hint: {'x': 0, 'y': 0}
-            background_color: (0, 0, 0, 0)
-            background_normal: ''
         Label:
-            text: 'Сентябрь'
+            id: period_lb
+            text: 'За всё время'
             bold: True
             color: 0.8, 0.8, 0.8, 1
             font_size: 72 / 3 # pix
             size_hint: (0.8, None)
             size: (1, 72 / 3) # pix
             text_size: self.size
-            halign: 'left'
+            halign: 'center'
             valign: 'middle'
-            pos_hint: {'center_y': 0.5}
-            pos: (45 / 3, 0) # pix
+            pos_hint: {'center_y': 0.5, 'center_x': 0.5}
         Image:
-            source: 'images/buttons_icons/calendar.png'
+            source: 'images/buttons_icons/arrow_orange_left.png'
             size_hint: (0.08, 1)
-            pos_hint: {'center_y': 0.5}
-            pos: (root.size[0] - 45 / 3 - self.size[0], 1) # pix
+            pos_hint: {'center_y': 0.5, 'x': 0.1}
+        Button:
+            size_hint: (0.5, 1)
+            background_color: 0, 0, 0, 0
+            on_press: root.change_period('previous')
+        Image:
+            source: 'images/buttons_icons/arrow_orange.png'
+            size_hint: (0.08, 1)
+            pos_hint: {'center_y': 0.5, 'right': 0.9}
+        Button:
+            size_hint: (0.5, 1)
+            pos_hint: {'right': 1}
+            background_color: 0, 0, 0, 0
+            on_press: root.change_period('next')
 
 
 # DOWN BUTTONS
