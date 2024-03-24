@@ -129,7 +129,6 @@ class MainLayout(FloatLayout):
         self.update()
 
     def change_period(self, to):
-        print(self.date)
         if (to == 'next') and (self.periods.index(self.period) != 3):
             self.period_lb.text = str(self.periods[self.periods.index(self.period) + 1])
             self.period = str(self.periods[self.periods.index(self.period) + 1])
