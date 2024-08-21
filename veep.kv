@@ -24,6 +24,8 @@
     add_purpose_example_border_border: add_purpose_example_border_border
     add_purpose_end_summ: add_purpose_end_summ
     period_lb: period_lb
+    graphs_main_graph_top: graphs_main_graph_top
+    # graphs_main_graph_bottom: graphs_main_graph_bottom
 
     ScreenManager:
         transition: NoTransition()
@@ -277,6 +279,24 @@
                 Rectangle:
                     pos: self.pos
                     size: self.size
+            RelativeLayout:
+                id: graphs_main_graph_top
+                size_hint: (0.95, 0.5)
+                pos_hint: {'center_x': 0.5, 'top': 0.9}
+                canvas.before:
+                    Color:
+                        rgba: 1, 0, 0, 0.5
+                    Rectangle:
+                        size: self.size
+            # RelativeLayout:
+            #     id: graphs_main_graph_bottom
+            #     size_hint: (0.9, 0.5)
+            #     pos_hint: {'center_x': 0.5, 'y': 0.1}
+            #     canvas.before:
+            #         Color:
+            #             rgba: 1, 0, 0, 0.5
+            #         Rectangle:
+            #             size: self.size   
 
     # OPERATIONS PAGE
         Screen:

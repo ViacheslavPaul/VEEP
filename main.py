@@ -7,6 +7,11 @@ from kivy.uix.label import Label
 from kivy.uix.widget import Widget
 from kivy.storage.jsonstore import JsonStore
 
+from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt2
+import numpy as np
+from kivy.garden.matplotlib import FigureCanvasKivyAgg
+
 from kivy.core.window import Window # del
 Window.size = (1080 / 3, 2202 / 3) # del
 
@@ -126,6 +131,7 @@ class MainLayout(FloatLayout):
         border.add_widget(btn)
         self.accounts_list.add_widget(border)
 
+
         self.update()
 
     def change_period(self, to):
@@ -185,8 +191,10 @@ class MainLayout(FloatLayout):
                 scale.canvas.add(Color(0.55, 0.55, 0.55))
                 scale.canvas.add(Rectangle(size=scale.size))
                 scale.canvas.add(Color(color[0], color[1], color[2]))
-                if scale_size <= 1:
+                if scale_size <= 1 and scale_size >= 0:
                     scale.canvas.add(Rectangle(size=(scale_size * 432 / 3, scale.height))) # pix
+                elif scale_size < 0:
+                    scale.canvas.add(Rectangle(size=(0, scale.height)))
                 else:
                     scale.canvas.add(Rectangle(size=(432 / 3, scale.height))) # pix
                 border.add_widget(scale)
@@ -483,7 +491,7 @@ class MainLayout(FloatLayout):
             self.main_sum_info.text = str(summ)
         except KeyError:
             pass
-#-----------
+
         accounts_list = []
         try:
             accounts = store.get('VEEP')["accounts"]
@@ -550,6 +558,108 @@ class MainLayout(FloatLayout):
         btn = Button(on_press=self.change_screen_to_add_account, background_color=(0, 0, 0, 0))
         border.add_widget(btn)
         self.accounts_list.add_widget(border)
+
+        self.graphs_main_graph_top.clear_widgets()
+
+        #decorate
+
+        plt.rcParams["axes.edgecolor"] = "#00000000"
+        plt.rcParams['figure.facecolor'] = '#1e1e1e'
+        plt.rcParams["xtick.color"] = "white"
+        plt.rcParams["ytick.color"] = "white"
+        plt.rcParams["axes.facecolor"] = "#00000000"
+
+        graph_rem_list = []
+        graph_add_list = []
+
+        if (self.period == 'За всё время'):
+            for i in range (len(operations)):
+                if operations[i]["type"] == 'rem':
+                    graph_rem_list.append(int(operations[i]["value"]))
+                if operations[i]["type"] == 'add':
+                    graph_add_list.append(int(operations[i]["value"]))
+        elif (self.period == 'За год'):
+            graph_rem_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            graph_add_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            plt.xlim(0, 12)
+            for i in range(len(operations)):
+                if (operations[i]['date'].split('-')[0] == str(date.today()).split('-')[0]):
+                    if operations[i]["type"] == 'rem':
+                        graph_rem_list[int(operations[i]["date"].split('-')[1]) - 1] += int(operations[i]["value"])
+                    if operations[i]["type"] == 'add':
+                        graph_add_list[int(operations[i]["date"].split('-')[1]) - 1] += int(operations[i]["value"])
+        elif (self.period == 'За месяц'):
+            month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            days = month[int(str(date.today()).split('-')[1]) - 1]
+            graph_rem_list = []
+            graph_add_list = []
+            for i in range (days):
+                graph_rem_list.append(0)
+                graph_add_list.append(0)
+            plt.xlim(0, days)
+            for i in range(len(operations)):
+                if (operations[i]['date'].split('-')[0] == str(date.today()).split('-')[0]) and (operations[i]['date'].split('-')[1] == str(date.today()).split('-')[1]):
+                    if operations[i]["type"] == 'rem':
+                        graph_rem_list[int(operations[i]["date"].split('-')[2]) - 1] += int(operations[i]["value"])
+                    if operations[i]["type"] == 'add':
+                        graph_add_list[int(operations[i]["date"].split('-')[2]) - 1] += int(operations[i]["value"])
+        elif (self.period == 'За день'):
+            month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            days = month[int(str(date.today()).split('-')[1]) - 1]
+            graph_rem_list = []
+            graph_add_list = []
+            for i in range (days):
+                graph_rem_list.append(0)
+                graph_add_list.append(0)
+            plt.xlim(0, days)
+            for i in range(len(operations)):
+                if (operations[i]['date'].split('-')[0] == str(date.today()).split('-')[0]) and (operations[i]['date'].split('-')[1] == str(date.today()).split('-')[1]):
+                    if operations[i]["type"] == 'rem':
+                        graph_rem_list[int(operations[i]["date"].split('-')[2]) - 1] += int(operations[i]["value"])
+                    if operations[i]["type"] == 'add':
+                        graph_add_list[int(operations[i]["date"].split('-')[2]) - 1] += int(operations[i]["value"])
+
+
+        try:
+            max_of_graph = max(max(graph_rem_list), max(graph_add_list))
+            if max_of_graph == 0:
+                max_of_graph = 1
+        except ValueError:
+            max_of_graph = 1
+
+        for i in range (len(graph_rem_list)):
+            graph_rem_list[i] = graph_rem_list[i] * 100 / max_of_graph
+
+        for i in range(len(graph_add_list)):
+            graph_add_list[i] = graph_add_list[i] * 100 / max_of_graph
+
+        print (max_of_graph)
+        print (graph_rem_list)
+        print (graph_add_list)
+
+        graph_rem_x = 0.5 + np.arange(len(graph_rem_list))
+        graph_add_x = 0.5 + np.arange(len(graph_add_list))
+
+        # define grid of plots
+        fig, axs = plt.subplots(nrows=2, ncols=1)
+
+        plt.ylim(0, 100)
+
+        # add data to plots
+        axs[0].hist([], bins='auto', color='orange')
+        axs[0].bar(graph_add_x, graph_add_list, width=1, edgecolor="#1e1e1e", linewidth=0.7, color = '#26d926')
+        axs[0].xaxis.tick_top()
+        axs[1].hist([], bins='auto', color='orange')
+        axs[1].bar(graph_rem_x, graph_rem_list, width=1, edgecolor="#1e1e1e", linewidth=0.7, color = '#ff2626')
+
+        axs[1].invert_yaxis()
+
+        fig.subplots_adjust(wspace=0, hspace=0)
+
+        self.graphs_main_graph_top.add_widget(FigureCanvasKivyAgg(plt.gcf()))
+
+#adwakjdlawhnfnjlkwsahfwaukfjhwsafjwlkaflisajflksanjajfwhujfkwaelfhwjakhfiwlafmliwkhu
+
     def add_account(self):
         name = self.add_account_name.text
         color = self.add_account_color
@@ -609,7 +719,7 @@ class MainLayout(FloatLayout):
         self.example_add_purpose_name = ''
         self.example_add_purpose_end_summ = ''
         self.screen_manager.current = 'main'
-#--------------------------------------------------------
+
     def add_action(self, instance):
         marks = ['/', '*', '+', '-', '.']
         if (instance.text == 'С'):
